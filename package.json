@@ -1,0 +1,24 @@
+{
+  "name": "pr-reviewer-starter",
+  "version": "0.1.0",
+  "description": "Week 1 starter: webhook receiver + LLM test script for the AI Agent PR Reviewer project",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "llm-test": "tsx src/llm-test.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "dotenv": "^16.4.5",
+    "fastify": "^5.1.0",
+    "octokit": "^5.0.5",
+    "reflect-metadata": "^0.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
