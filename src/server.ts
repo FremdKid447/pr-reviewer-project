@@ -109,13 +109,19 @@ app.post("/webhook", async (request, reply) => {
     // Log the whole thing at least once and read through it — you're
     // looking for: action (opened/synchronize/closed), pull_request.number,
     // pull_request.diff_url, pull_request.head.sha, repository.full_name.
-    // console.log(JSON.stringify(body, null, 2));
+    console.log(JSON.stringify(body, null, 2));
 
     const action = body.action;
     const prNumber = (body as any).pull_request?.number;
     console.log(`--> action: ${action}, PR number: ${prNumber}`);
 
+    if (!["opened", "synchronize", "reopened"].includes(action as string)) {
+      console.log(`Skipping PR review for action: ${action}`);
+      return;
+    }
+
     let diffText;
+    let diffReview: DiffReview | null = null;
 
     try {
       const prResponse = await myOctokit.rest.pulls.get({
@@ -149,32 +155,33 @@ app.post("/webhook", async (request, reply) => {
 
       try {
         const parsed = JSON.parse(rawReviewText);
-        const review = await validateDiffReview(parsed);
+        diffReview = await validateDiffReview(parsed);
 
-        if (!review) {
+        if (!diffReview) {
           console.error("LLM response failed class-validator validation:", parsed);
           return;
         }
 
-        console.log("Validated diff review:", JSON.stringify(review, null, 2));
+        console.log("Validated diff review:", JSON.stringify(diffReview, null, 2));
       } catch (error) {
         console.error("LLM response was not valid JSON:", error);
       }
+
+      await myOctokit.rest.issues.createComment({
+        owner: (body as any).repository?.owner?.login,
+        repo: (body as any).repository?.name,
+        issue_number: prNumber,
+        body: diffReview
+          ? `Diff review completed successfully. Summary:\n\n\`\`\`json\n${JSON.stringify(
+              diffReview,
+              null,
+              2
+            )}\n\`\`\``
+          : "Diff review failed or returned invalid JSON.",
+      });
     } catch (err) {
       console.error("Error fetching PR details:", err);
     }
-
-    // myOctokit.rest.pulls.get({
-    //   owner: (body as any).repository?.owner?.login,
-    //   repo: (body as any).repository?.name,
-    //   pull_number: prNumber,
-    //   mediaType: { format: "diff" },
-    // }).then((prResponse) => {
-    //   diffText = prResponse.data;
-    //   console.log(diffText);
-    // }).catch((err) => {
-    //   console.error("Error fetching PR details:", err);
-    // });
   }
 
   // Respond quickly. GitHub expects a 2xx response soon after delivery,
