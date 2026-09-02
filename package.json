@@ -1,7 +1,7 @@
 {
   "name": "pr-reviewer-starter",
   "version": "0.1.0",
-  "description": "Week 1 starter: webhook receiver + LLM test script for the AI Agent PR Reviewer project",
+  "description": "Automated GitHub PR reviewer powered by Claude AI with structured analysis and inline comments",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",

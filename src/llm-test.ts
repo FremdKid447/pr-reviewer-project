@@ -1,9 +1,8 @@
 /**
- * Week 1 goal #2: prove you can call the LLM API and get a structured-ish
- * review back for a hardcoded diff. Run with: npm run llm-test
+ * Standalone LLM testing script.
  *
- * This is deliberately NOT connected to the webhook server yet — that
- * wiring is Week 2. Right now you're just learning the API shape.
+ * Tests the Claude API with a sample diff to verify review generation
+ * works correctly. Run with: npm run llm-test
  */
 
 import "dotenv/config";
@@ -62,16 +61,13 @@ async function main() {
   const textBlock = message.content.find((block) => block.type === "text");
   console.log("Raw response:\n", textBlock?.text);
 
-  // Try parsing it as JSON to see if the model followed instructions.
-  // Don't worry about making this robust yet — that comes in Week 2/3
-  // once you add a schema (zod) to validate the shape properly.
+  // Try parsing it as JSON to validate the response shape
   try {
     const parsed = JSON.parse(textBlock?.text ?? "[]");
     console.log("\nParsed findings:");
     console.table(parsed);
   } catch (err) {
-    console.log("\n(Could not parse as JSON yet — that's OK for Week 1. " +
-      "Note it and revisit prompt strictness in Week 2.)");
+    console.log("\n(Could not parse as JSON — check the raw response above and verify it follows the schema.)");
   }
 }
 

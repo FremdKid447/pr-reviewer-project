@@ -1,9 +1,8 @@
 /**
- * Week 1 goal: receive a GitHub `pull_request` webhook and log its shape.
+ * GitHub webhook receiver for automated PR reviews.
  *
- * This intentionally does NOT verify signatures, fetch diffs, or call an LLM
- * yet — that's Week 2. Right now the only job is: stand up a server, receive
- * a real webhook, and actually look at the payload GitHub sends you.
+ * Receives pull_request webhook events from GitHub, fetches the diff,
+ * calls Claude for analysis, and posts structured review comments.
  */
 
 import Fastify from "fastify";
